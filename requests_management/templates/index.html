@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}Feature Requests{% endblock %}</h1>
+
+    <a class="action" href="{{ url_for('request.create') }}">New</a>
+
+{% endblock %}
+
+{% block content %}
+    {% for req in client_requests %}
+        <article class="client_requests">
+            <header>
+                <div>
+                    <h1>{{ req['title'] }}</h1>
+                    <div class="about">priority {{ req['client_priority'] }}
+                        created on {{ req['created'].strftime('%Y-%m-%d') }} remaining
+                        days {{ (req.targeted_date - today).days }}</div>
+                </div>
+                <a class="action" href="{{ url_for('request.update', req_id=req.id) }}">View</a>
+            </header>
+            <p class="description">{{ req.description }}</p>
+        </article>
+        {% if not loop.last %}
+            <hr>
+        {% endif %}
+    {% endfor %}
+{% endblock %}

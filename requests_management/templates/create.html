@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+
+{% block header %}
+    <h1>{% block title %}New Feature Request{% endblock %}</h1>
+{% endblock %}
+
+{% block content %}
+    <form method="post">
+        <label for="title">Title</label>
+        <input name="title" id="title" value="{{ request.form['title'] }}" required>
+        <label for="description">Description</label>
+        <textarea required name="description" id="description">{{ request.form['description'] }}</textarea>
+
+        <label for="client_id">Clients</label>
+
+        <select required title="available clients" name="client_id" id="client_id">
+            {% for client in clients %}
+                <option value={{ client.id }}>{{ client.name }} {{ request.form['client_id'] }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="product_id">Products</label>
+        <select required title="available products" name="product_id" id="product_id">
+            {% for product in products %}
+                <option value={{ product.id }}>{{ product.name }} {{ request.form['product_id'] }}</option>
+            {% endfor %}
+        </select>
+        <br>
+        <label for="date">Targeted Date</label>
+        <input type="date" id="date" name="targeted_date"
+               value={{ request.form['targeted_date'] }}
+                       required/>
+        <br>
+        <input type="submit" value="save">
+
+    </form>
+
+
+{% endblock %}
