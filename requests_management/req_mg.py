@@ -87,7 +87,7 @@ def update(req_id):
 
     if request.method == 'POST':
         title = request.form['title']
-        description = request.form['body']
+        description = request.form['description']
         error = None
 
         if not title:
