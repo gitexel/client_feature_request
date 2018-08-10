@@ -5,7 +5,8 @@ to run the project in unix systems
 
 ```
 export FLASK_ENV=development
-export FLASK_APP=requests_managements
+export FLASK_APP=requests_management
 flask init-db
 flask run
+
 ```
