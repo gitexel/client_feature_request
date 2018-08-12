@@ -25,9 +25,8 @@ class Request(db.Model):
     created = db.Column(db.TIMESTAMP, nullable=False, default=datetime.utcnow)
     title = db.Column(db.String(250), nullable=False)
     description = db.Column(db.Text, nullable=False)
-
-    client_id = db.Column(db.Integer, db.ForeignKey('client.id'), nullable=False)
-    product_id = db.Column(db.Integer, db.ForeignKey('product.id'), nullable=False)
+    client_id = db.Column(db.Integer, db.ForeignKey('client.id', ondelete='CASCADE'), nullable=False)
+    product_id = db.Column(db.Integer, db.ForeignKey('product.id', ondelete='CASCADE'), nullable=False)
     client_priority = db.Column(db.Integer, unique=True, nullable=False)
     targeted_date = db.Column(db.DateTime, unique=True, nullable=False)
 
