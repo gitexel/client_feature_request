@@ -22,15 +22,15 @@ def create_app(test_config=None):
     # ensure the instance folder exists
     try:
         os.makedirs(app.instance_path)
-    except OSError:
-        pass
+    except OSError as Eos:
+        app.logger.info('Failed to create instance folder: %s' % Eos)
 
     from . import db
     db.init_app(app)
 
     from . import req_mg
+    # add request page
     app.register_blueprint(req_mg.bp)
-    # app.register_blueprint(blog.bp)
     app.add_url_rule('/', endpoint='index')
 
     return app
