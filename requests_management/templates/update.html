@@ -1,17 +1,17 @@
 {% extends 'base.html' %}
 
 {% block header %}
-    <h1>{% block title %}Edit "{{ client_request['title'] }}"{% endblock %}</h1>
+    <h1>{% block title %}Edit "{{ client_request.title }}"{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
     <form method="post">
 
         <label for="title">Title</label>
-        <input name="title" id="title" value="{{ request.form['title']  or client_request['title'] }}" required>
+        <input name="title" id="title" value="{{ request.form['title']  or client_request.title }}" required>
         <label for="description">Description</label>
         <textarea required name="description"
-                  id="description">{{ request.form['description'] or client_request['description'] }} </textarea>
+                  id="description">{{ request.form['description'] or client_request.description }}</textarea>
 
         <label for="client_id">Clients</label>
 
@@ -32,8 +32,8 @@
         <br>
         <label for="date">Targeted Date</label>
         <input type="date" id="date" name="targeted_date"
-               value={{ request.form['targeted_date'] or client_request['targeted_date'].strftime('%Y-%m-%d') }}
-                       min="2018-01-01" max="2018-12-31" required/>
+               value={{ request.form['targeted_date'] or client_request.targeted_date.strftime('%Y-%m-%d') }}
+                       required/>
         <br>
         <input type="submit" value="Save">
     </form>
