@@ -1,28 +1,176 @@
 {% extends 'base.html' %}
 
-{% block header %}
-    <h1>{% block title %}Feature Requests{% endblock %}</h1>
+{% block title %} Dashboard {% endblock %}
 
-    <a class="action" href="{{ url_for('request.create') }}">New</a>
+{% block header %}
+
+
+    <nav role="navigation" class="navbar navbar-light bg-light">
+        <a class="navbar-brand">Feature Request Dashboard</a>
+        <button type="button" class="btn btn-primary" data-toggle="modal"
+                data-target="#request_modal_create"> Add New
+        </button>
+    </nav>
 
 {% endblock %}
 
+
 {% block content %}
-    {% for req in client_requests %}
-        <article class="client_requests">
-            <header>
-                <div>
-                    <h1>{{ req['title'] }}</h1>
-                    <div class="about">priority {{ req['client_priority'] }}
-                        created on {{ req['created'].strftime('%Y-%m-%d') }} remaining
-                        days {{ (req.targeted_date - today).days }}</div>
+    <main role="main" class="container" id="featureList">
+        <div class="row">
+            <div class="col-12">
+                <h3 class="py-4">Feature Submitted</h3>
+                <table class="table table-white table-hover">
+                    <thead class="thead">
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Client</th>
+                        <th scope="col">Product Area</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Created on</th>
+                        <th scope="col">Target Date</th>
+                    </tr>
+                    </thead>
+                    <tbody data-bind="foreach: { data: requests, as: 'req' }, visible() requests > 0">
+                    <tr data-bind="click: function(data, event) {$parent.setForm(req), data, event}"
+                        data-toggle="modal"
+                        data-target="#request_modal_edit">
+                        <td data-bind="text: req.id"></td>
+
+                        <td data-bind="text: req.title"></td>
+                        <td data-bind="text: req.client"></td>
+                        <td data-bind="text: req.product"></td>
+                        <td data-bind="text: req.client_priority"></td>
+                        <td data-bind="text: req.created"></td>
+                        <td data-bind="text: req.targeted_date"></td>
+
+                    </tr>
+
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+
+    <!-- Modal -->
+    <div class="modal fade" id="request_modal_edit" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="request_title">Feature Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
                 </div>
-                <a class="action" href="{{ url_for('request.update', req_id=req.id) }}">View</a>
-            </header>
-            <p class="description">{{ req.description }}</p>
-        </article>
-        {% if not loop.last %}
-            <hr>
-        {% endif %}
-    {% endfor %}
+
+                <div class="modal-body">
+                    <form>
+                        <input type="hidden" id="request_id_edit">
+
+                        <div class="form-group">
+                            <label for="title_edit">Title</label>
+                            <input name="title" class="form-control" type="text" id="title_edit" disabled>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="description_edit">Description</label>
+                            <textarea name="description" class="form-control" id="description_edit" rows="3"
+                                      disabled></textarea>
+
+                        </div>
+                        <div class="form-group">
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="client_edit">Client</label>
+                                    <input name="client" class="form-control" type="text" id="client_edit" disabled>
+
+                                </div>
+                                <div class="col">
+                                    <label for="product_edit">Product</label>
+                                    <input name="product" class="form-control" type="text" id="product_edit" disabled>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="targeted_date_edit">Targeted Date</label>
+                            <input name="targeted_date" id="targeted_date_edit" class="form-control"
+                                   disabled>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button data-bind="click: deleteRequest" type="button" class="btn btn-danger">Delete</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="request_modal_create" tabindex="-1" role="dialog"
+         aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLongTitle">Create New Feature Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <form data-bind="submit: create">
+                        <div class="form-group">
+                            <label for="title">Title</label>
+                            <input name="title" class="form-control" type="text" id="title" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="description">Description</label>
+                            <textarea name="description" class="form-control" id="description" rows="3"
+                                      required></textarea>
+
+                        </div>
+                        <div class="form-group">
+
+                            <div class="form-row">
+                                <div class="col">
+                                    <label for="client">Choose Client</label>
+                                    <select name="client_id" data-bind="foreach: clients" class=" form-control"
+                                            id="client"
+                                            required>
+                                        <option data-bind="text: name , value: id "></option>
+                                    </select>
+                                </div>
+                                <div class="col">
+                                    <label for="product">Choose Product</label>
+
+                                    <select name="product_id" data-bind="foreach: products" class=" form-control"
+                                            id="product"
+                                            required>
+                                        <option data-bind="text: name , value: id "></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="targeted_date">Targeted Date</label>
+                            <input type="date" name="targeted_date" id="targeted_date"
+                                   data-bind="min: 2018-8-15 " class="form-control" required>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block scripts %}
+    <script src="{{ url_for('static', filename='base.js') }}"></script>
 {% endblock %}
