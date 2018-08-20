@@ -1,7 +1,7 @@
-from flask import (Blueprint, request, current_app, jsonify)
+from flask import (Blueprint, request, jsonify, current_app as app)
 
-from requests_management import InvalidUsage
-from requests_management.models import *
+from feature_request.models import *
+from feature_request.utils import InvalidUsage, to_datetime
 from sqlalchemy import exc
 
 bp = Blueprint('api', __name__)
@@ -29,10 +29,15 @@ def all_requests():
         # get all feature requests from the database
         client_requests = Request.query.all()
     except (exc.SQLAlchemyError, exc.DatabaseError, ValueError) as Se:
-        current_app.logger.error('Failed to get data for index page: %s' % Se)
-        raise InvalidUsage('Failed to get data for index page', status_code=500)
+        app.logger.error('Failed to get data for index page: %s' % Se)
+        raise InvalidUsage('Failed to get feature requests', status_code=500)
 
     return RequestSchema().dumps(many=True, obj=client_requests).data
+
+
+@bp.route('/api/v1/request/<int:req_id>', methods=('GET',))
+def get_request(req_id: int):
+    return RequestSchema().dumps(obj=_get_request(req_id)).data
 
 
 @bp.route('/api/v1/request/', methods=('POST', 'GET'))
@@ -58,7 +63,7 @@ def create():
                 client_request.client_priority = get_priority()
                 db.session.commit()
         except exc.SQLAlchemyError as Se:
-            current_app.logger.error('Failed to save data for feature request:  %s' % Se)
+            app.logger.error('Failed to save data for feature request:  %s' % Se)
             raise InvalidUsage('Unable create feature request', status_code=500)
 
         return success_response(status_code=201)
@@ -71,7 +76,7 @@ def get_clients():
         clients = Client.query.all()
 
     except exc.SQLAlchemyError as Se:
-        current_app.logger.error('Failed to get clients: %s' % Se)
+        app.logger.error('Failed to get clients: %s' % Se)
         raise InvalidUsage('Failed to get clients')
 
     result = ClientSchema().dumps(many=True, obj=clients)
@@ -82,11 +87,11 @@ def get_clients():
 @bp.route('/api/v1/products', methods=('GET',))
 def get_products():
     try:
-        # get all clients
+        # get all products
         products = Product.query.all()
 
     except exc.SQLAlchemyError as Se:
-        current_app.logger.error('Failed to get data for create page: %s' % Se)
+        app.logger.error('Failed to get data for create page: %s' % Se)
         raise InvalidUsage('Failed to get clients')
 
     result = ProductSchema().dumps(many=True, obj=products)
@@ -105,7 +110,7 @@ def get_priority():
     return 1
 
 
-def get_request(req_id: int):
+def _get_request(req_id: int):
     """
     :type req_id: int
     :return Feature request from the database by the request id
@@ -115,14 +120,14 @@ def get_request(req_id: int):
     try:
 
         # get the feature request from the database
-        client_request = Request.query.filter(Request.id == req_id).first()
+        client_request = Request.query.get(req_id)
 
         if not client_request:
-            raise InvalidUsage('Failed to get Feature request id:%d' % req_id, status_code=404)
+            raise InvalidUsage('The Feature Request not found, id: %d' % req_id, status_code=404)
 
     except (exc.SQLAlchemyError, exc.DatabaseError, ValueError) as Se:
         # show internal server error if problem occurred with database connection
-        current_app.logger.error('Failed get Feature request id:%d -> %s' % (req_id, Se))
+        app.logger.error('Failed get Feature request id:%d -> %s' % (req_id, Se))
         raise InvalidUsage('Failed to get Feature request id:%d -> internal error' % req_id, status_code=500)
 
     return client_request
@@ -134,7 +139,7 @@ def delete(req_id: int):
     the function will delete a feature request by it's id and will refresh the priority for all other feature requests
     :type req_id: int
     """
-    client_request = get_request(req_id)
+    client_request = _get_request(req_id)
     client_priority = client_request.client_priority
     db.session.delete(client_request)
 
@@ -151,7 +156,7 @@ def delete(req_id: int):
         db.session.rollback()
 
         # show internal server error if problem occurred with database connection
-        current_app.logger.error('Failed to delete request %d -> %s' % (req_id, Se))
+        app.logger.error('Failed to delete request %d -> %s' % (req_id, Se))
 
         raise InvalidUsage('Failed to delete request id:%d' % req_id, status_code=500)
 
@@ -175,6 +180,9 @@ def input_validation(form: dict):
         if not title:
             error = 'Title is required.'
 
+        if len(title) > 250:
+            error = 'Title is too long'
+
         if not description:
             error = 'Description is required.'
 
@@ -187,16 +195,16 @@ def input_validation(form: dict):
         if not targeted_date:
             error = 'Targeted Date is required.'
         else:
-            targeted_date = datetime.strptime(targeted_date, '%Y-%m-%d')
-            if targeted_date < datetime.today():
+            targeted_date = to_datetime(targeted_date)
+            if targeted_date < datetime.utcnow():
                 error = 'Targeted date is old'
 
         if error is not None:
             # show the errors to the current page
-            raise InvalidUsage(error, status_code=400)
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
     except (KeyError, TypeError) as e:
-        current_app.logger.warning('Input validation error: %s' % e)
+        app.logger.warning('Input validation error: %s' % e)
         raise InvalidUsage('Bad Request', status_code=400)
 
     return dict(
