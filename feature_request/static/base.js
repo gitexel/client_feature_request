@@ -9,6 +9,7 @@ function BaseViewModel() {
     self.products_object = {};
 
     self.get_all_requests = function () {
+
         if (self.requests().length > 0) {
             self.requests.removeAll();
         }
@@ -82,7 +83,6 @@ function BaseViewModel() {
     self.setForm = function (req) {
 
         document.getElementById('request_title').innerHTML = 'Feature Request Priority #' + req.client_priority();
-        ;
         document.getElementById('request_id_edit').value = req.id();
         document.getElementById('title_edit').value = req.title();
         document.getElementById('description_edit').value = req.description();
