@@ -1,9 +1,9 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='requests_management',
+    name='feature_request',
     version='0.0.2',
-    packages=find_packages(),
+    packages=find_packages(exclude=['tests']),
     include_package_data=True,
     url='',
     license='',
@@ -13,5 +13,6 @@ setup(
     install_requires=[
         'flask', 'pytest', 'flask-sqlalchemy', 'flask-marshmallow', 'marshmallow-sqlalchemy'
     ],
+    test_suite='tests',
     description=''
 )
