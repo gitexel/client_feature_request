@@ -1,4 +1,5 @@
-from requests_management.db import db, ma
+from feature_request.db import ma, db
+
 from datetime import datetime
 
 
