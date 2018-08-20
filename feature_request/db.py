@@ -5,7 +5,7 @@ from flask_marshmallow import Marshmallow
 
 # SQLAlchemy db
 db = None
-# to return models as json response
+# marshmallow
 ma = None
 
 
