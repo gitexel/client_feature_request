@@ -32,7 +32,7 @@
                         <th scope="col">Target Date</th>
                     </tr>
                     </thead>
-                    <tbody data-bind="foreach: { data: requests, as: 'req' }, visible() requests > 0">
+                    <tbody data-bind="foreach: { data: requests, as: 'req' }, visible: requests().length > 0">
                     <tr data-bind="click: function(data, event) {$parent.setForm(req), data, event}"
                         data-toggle="modal"
                         data-target="#request_modal_edit">
