@@ -1,0 +1,15 @@
+language: python
+python:
+  - "3.6"
+
+install:
+  # python dependencies
+  - pip install -r feature_request/requirements
+  - pip install coveralls --quiet
+
+
+script:
+  - cd feature_request
+  - python -m pytest tests/
+
+after_success: coveralls
