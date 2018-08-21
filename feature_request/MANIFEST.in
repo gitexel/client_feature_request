@@ -1,0 +1,4 @@
+graft feature_request/static
+graft feature_request/templates
+graft feature_request/tests
+global-exclude *.pyc
