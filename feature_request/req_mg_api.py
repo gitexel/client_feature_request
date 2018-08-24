@@ -40,10 +40,10 @@ def get_request(req_id: int):
     return RequestSchema().dumps(obj=_get_request(req_id)).data
 
 
-@bp.route('/api/v1/request/create', methods=('POST',))
+@bp.route('/api/v1/request/', methods=('POST',))
 def create():
     """ Create new feature requests for the clients"""
-    client_request_dict = _input_validation()
+    client_request_dict = _input_validation(request.json)
 
     if client_request_dict:
 
@@ -162,11 +162,10 @@ def delete(req_id: int):
     return success_response()
 
 
-def _input_validation():
+def _input_validation(form: dict):
     """
     :return the form as dict after validation
     """
-    form = request.get_json(force=True)
 
     try:
         title = form['title']
