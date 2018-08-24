@@ -2,11 +2,13 @@ import click
 from flask.cli import with_appcontext
 from flask_sqlalchemy import SQLAlchemy
 from flask_marshmallow import Marshmallow
+from sqlalchemy.exc import SQLAlchemyError
 
 # SQLAlchemy db
-db = None
+db = SQLAlchemy()
+
 # marshmallow
-ma = None
+ma = Marshmallow()
 
 
 def init_db():
@@ -17,15 +19,13 @@ def init_db():
 @with_appcontext
 def init_db_command():
     """create new tables if not exist"""
-    init_db()
-    click.echo('Initialized the database.')
+    try:
+        init_db()
+        click.echo('Initialized the database.')
+    except SQLAlchemyError as Se:
+        click.echo('Can\'t create db: %s' % Se)
 
 
 def init_app(app):
-    global db
-    global ma
     app.cli.add_command(init_db_command)
-    db = SQLAlchemy(app)
-    ma = Marshmallow(app)
-
     db.init_app(app)
