@@ -11,8 +11,15 @@ setup(
     author_email='googexel@gmail.com',
     zip_safe=False,
     install_requires=[
-        'flask', 'pytest', 'flask-sqlalchemy', 'flask-marshmallow', 'marshmallow-sqlalchemy'
+        'flask', 'flask-sqlalchemy', 'flask-marshmallow', 'marshmallow-sqlalchemy'
     ],
+    extras_require={
+        'test': [
+            'pytest',
+            'coverage',
+            'dateparser'
+        ],
+    },
     test_suite='tests',
     description=''
 )
