@@ -1,0 +1,5 @@
+include instance/req_mg.db
+graft feature_request/static
+graft feature_request/templates
+graft tests
+global-exclude *.pyc
