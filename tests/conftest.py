@@ -20,7 +20,9 @@ def app():
 
     yield app
 
-    _db.drop_all()
+    with app.app_context():
+        _db.drop_all()
+
     os.close(db_fd)
     os.unlink(db_path)
 
