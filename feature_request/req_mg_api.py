@@ -40,11 +40,10 @@ def get_request(req_id: int):
     return RequestSchema().dumps(obj=_get_request(req_id)).data
 
 
-@bp.route('/api/v1/request/', methods=('POST', 'GET'))
+@bp.route('/api/v1/request/create', methods=('POST',))
 def create():
     """ Create new feature requests for the clients"""
-
-    client_request_dict = input_validation(form=request.json)
+    client_request_dict = _input_validation()
 
     if client_request_dict:
 
@@ -60,7 +59,7 @@ def create():
             except exc.IntegrityError:
                 db.session.rollback()
                 # get the most recent priority if we faced an integrity error
-                client_request.client_priority = get_priority()
+                client_request.client_priority = _get_priority()
                 db.session.commit()
         except exc.SQLAlchemyError as Se:
             app.logger.error('Failed to save data for feature request:  %s' % Se)
@@ -99,7 +98,7 @@ def get_products():
     return result.data, result.errors or 200
 
 
-def get_priority():
+def _get_priority():
     """ :return the priority for the current request """
 
     priority = db.session.query(db.func.max(Request.client_priority)).scalar()
@@ -163,12 +162,11 @@ def delete(req_id: int):
     return success_response()
 
 
-def input_validation(form: dict):
+def _input_validation():
     """
     :return the form as dict after validation
-    :type form: dict
     """
-    error = None
+    form = request.get_json(force=True)
 
     try:
         title = form['title']
@@ -179,29 +177,33 @@ def input_validation(form: dict):
 
         if not title:
             error = 'Title is required.'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
         if len(title) > 250:
             error = 'Title is too long'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
         if not description:
             error = 'Description is required.'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
         if not client_id:
             error = 'Client is required.'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
         if not product_id:
             error = 'Product is required.'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
         if not targeted_date:
             error = 'Targeted Date is required.'
+            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
+
         else:
             targeted_date = to_datetime(targeted_date)
             if targeted_date < datetime.utcnow():
                 error = 'Targeted date is old'
-
-        if error is not None:
-            # show the errors to the current page
-            raise InvalidUsage('Bad Request: %s' % error, status_code=400)
+                raise InvalidUsage('Bad Request: %s' % error, status_code=400)
 
     except (KeyError, TypeError) as e:
         app.logger.warning('Input validation error: %s' % e)
@@ -213,7 +215,7 @@ def input_validation(form: dict):
         description=description,
         client_id=client_id,
         product_id=product_id,
-        client_priority=get_priority(),
+        client_priority=_get_priority(),
         targeted_date=targeted_date
 
     )
