@@ -58,10 +58,12 @@ function BaseViewModel() {
         // If the form data is valid, post the serialized form data to the web API.
         // This is the function that is called on each element of the array.
         let json_data = {};
-        for (let item of $(formElement).serializeArray().values()) {
-            json_data[item['name']] = item['value']
-        }
-        self.ajax(self.requestsURI, 'POST', false, false, json_data).done(function () {
+
+        $.each($(formElement).serializeArray(), function (i, field) {
+            json_data[field.name] = field.value
+        });
+
+        self.ajax(self.requestsURI + 'create', 'POST', false, false, json_data).done(function () {
             $('#request_modal_create').modal('hide');
             $("#request_modal_create.modal input").val("");
             $("#request_modal_create.modal textarea").val("");
