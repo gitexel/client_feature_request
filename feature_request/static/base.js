@@ -63,7 +63,7 @@ function BaseViewModel() {
             json_data[field.name] = field.value
         });
 
-        self.ajax(self.requestsURI + 'create', 'POST', false, false, json_data).done(function () {
+        self.ajax(self.requestsURI, 'POST', false, false, json_data).done(function () {
             $('#request_modal_create').modal('hide');
             $("#request_modal_create.modal input").val("");
             $("#request_modal_create.modal textarea").val("");
