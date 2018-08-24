@@ -1,3 +1,5 @@
+click
+sqlalchemy
 flask
 flask-sqlalchemy
 flask-marshmallow
