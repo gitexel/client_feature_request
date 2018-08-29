@@ -62,14 +62,23 @@ function BaseViewModel() {
         $.each($(formElement).serializeArray(), function (i, field) {
             json_data[field.name] = field.value
         });
+        let t_date = moment(json_data['targeted_date']);
 
-        self.ajax(self.requestsURI, 'POST', false, false, json_data).done(function () {
-            $('#request_modal_create').modal('hide');
-            $("#request_modal_create.modal input").val("");
-            $("#request_modal_create.modal textarea").val("");
-            self.get_all_requests()
-        });
+        if (moment() < t_date) {
 
+            self.ajax(self.requestsURI, 'POST', false, false, json_data).done(function () {
+                $('#request_modal_create').modal('hide');
+                $("#request_modal_create.modal input").val("");
+                $("#request_modal_create.modal textarea").val("");
+                $(".alert-warning").fadeOut();
+
+                self.get_all_requests()
+            });
+        } else {
+            $(".alert-warning").text("The target date is old. should be in the future.").fadeIn();
+
+            // alert('Target Date is old. date should be in the future.')
+        }
 
     };
 
@@ -77,6 +86,7 @@ function BaseViewModel() {
         let id = document.getElementById('request_id_edit').value;
         self.ajax(self.requestsURI + id, 'DElETE', false, false).done(function () {
             $('#request_modal_edit').modal('hide');
+
             self.get_all_requests()
 
         })

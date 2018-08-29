@@ -1,10 +1,14 @@
-{% extends 'base.html' %}
+<!doctype html>
 
-{% block title %} Dashboard {% endblock %}
+<title> Dashboard </title>
+<link rel="stylesheet" href="static/style.css">
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css"
+      integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
 
-{% block header %}
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-
+<header>
     <nav role="navigation" class="navbar navbar-light bg-light">
         <a class="navbar-brand">Feature Request Dashboard</a>
         <button type="button" class="btn btn-primary" data-toggle="modal"
@@ -12,10 +16,13 @@
         </button>
     </nav>
 
-{% endblock %}
+</header>
+
+<body>
+
+<div class="container-fluid">
 
 
-{% block content %}
     <main role="main" class="container" id="featureList">
         <div class="row">
             <div class="col-12">
@@ -111,6 +118,7 @@
 
     <div class="modal fade" id="request_modal_create" tabindex="-1" role="dialog"
          aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+
         <div class="modal-dialog modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-header">
@@ -122,6 +130,9 @@
 
                 <div class="modal-body">
                     <form data-bind="submit: create">
+                        <div class="alert alert-warning" role="alert" style="display:none;">
+
+                        </div>
                         <div class="form-group">
                             <label for="title">Title</label>
                             <input name="title" class="form-control" type="text" id="title" required>
@@ -157,7 +168,7 @@
                         <div class="form-group">
                             <label for="targeted_date">Targeted Date</label>
                             <input type="date" name="targeted_date" id="targeted_date"
-                                   data-bind="min: 2018-8-15 " class="form-control" required>
+                                   class="form-control" required>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary">Submit</button>
@@ -169,8 +180,23 @@
         </div>
     </div>
 
-{% endblock %}
 
-{% block scripts %}
-    <script src="{{ url_for('static', filename='base.js') }}"></script>
-{% endblock %}
+</div>
+
+</body>
+
+<script src="https://code.jquery.com/jquery-3.3.1.min.js"
+        integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js"
+        integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49"
+        crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"
+        integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy"
+        crossorigin="anonymous"></script>
+<script type='text/javascript' src="https://cdnjs.cloudflare.com/ajax/libs/knockout/3.4.2/knockout-min.js"
+        crossorigin="anonymous"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"
+        crossorigin="anonymous"></script>
+
+<script src="static/base.js"></script>
