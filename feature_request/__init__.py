@@ -32,6 +32,13 @@ def create_app(test_config=None):
     from feature_request import views
     from feature_request import req_mg_api
 
+    @app.after_request
+    def response_headers(response):
+        response.headers['X-Frame-Options'] = 'SAMEORIGIN'  # avoid clickjacking
+        response.headers['X-Content-Type-Options'] = 'nosniff'  # avoid xss
+        response.headers['X-XSS-Protection'] = '1; mode=block'  # avoid xss
+        return response
+
     # add request page
     app.register_blueprint(req_mg_api.bp)
 
